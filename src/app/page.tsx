@@ -3,22 +3,16 @@
 import { useForm, SubmitHandler } from "react-hook-form"
 import { useState } from "react"
 
-type History = { dir: string; command: string | null; result: string | null | undefined }
-type Histories = History[]
-type Order = { order: string }
+import { History, Histories, Order } from '@/type'
+import { availableOder, getResult } from '@/order'
+import { HOMEDIR } from './contents'
 
 const dirName = (path: string) => path.split("/").slice(-1)[0]
 
-const HOMEDIR = "/home/nkita"
-const availableOder = [
-  "cat",
-  "ls",
-]
-
-
 export default function Home() {
-  const [histories, setHistory] = useState<Histories>([{ dir: "/home/nkita", command: "cat", result: null }])
+  const [histories, setHistory] = useState<Histories>([])
   const [currentDir, setCurrentDir] = useState(HOMEDIR)
+  const [inprogress, setInprogress] = useState(false)
 
   const {
     register,
@@ -27,11 +21,10 @@ export default function Home() {
     watch,
   } = useForm<Order>()
 
-  const onSubmit: SubmitHandler<Order> = (data: any) => {
-    let result
-    if (data.order) {
-      result = availableOder.includes(data.order) ? null : `-bash: ${data.order}: command not found`
-    }
+  const onSubmit: SubmitHandler<Order> = async (data: any) => {
+    setInprogress(true)
+    const result = getResult(data.order, setCurrentDir)
+
     setHistory(
       [...histories,
       {
@@ -41,17 +34,20 @@ export default function Home() {
       }]
     )
     reset()
+    setInprogress(false)
   }
   return (
     <div className=" h-screen ">
       {histories.map((h, i) => {
         return <div key={i}><Line history={h} /></div>
       })}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex">
-          <Dicrectory dir={currentDir} /><div><input type='text' maxLength={30} size={30} className={"border-0  focus:outline-dotted"} autoComplete="off" {...register("order")} /></div>
-        </div>
-      </form>
+      {!inprogress &&
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex">
+            <Dicrectory dir={currentDir} /><div><input type='text' maxLength={30} size={30} className={"border-0  focus:outline-dotted"} autoComplete="off" {...register("order")} /></div>
+          </div>
+        </form>
+      }
     </div>
   )
 }

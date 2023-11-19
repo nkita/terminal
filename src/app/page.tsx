@@ -4,15 +4,20 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { useState } from "react"
 
 import { History, Histories, Order } from '@/type'
-import { availableOder, getResult } from '@/order'
-import { HOMEDIR } from './contents'
-
-const dirName = (path: string) => path.split("/").slice(-1)[0]
+import { guest } from '@/class/user'
 
 export default function Home() {
   const [histories, setHistory] = useState<Histories>([])
-  const [currentDir, setCurrentDir] = useState(HOMEDIR)
   const [inprogress, setInprogress] = useState(false)
+  const [currentDir, setCurrentDir] = useState(guest.currentDir)
+
+  // # Todo Delete this array. 
+  const availableOder = [
+    "cat",
+    "ls",
+    "cd",
+    "pwd",
+  ]
 
   const {
     register,
@@ -23,7 +28,20 @@ export default function Home() {
 
   const onSubmit: SubmitHandler<Order> = async (data: any) => {
     setInprogress(true)
-    const result = getResult(data.order, setCurrentDir)
+
+    const commands = data.order.replace(/ +/g, " ").split(" ");
+    const command_name = commands[0]
+    let result
+    if (command_name && !availableOder.includes(command_name)) {
+      result = `-bash: ${data.order}: command not found`
+    } else {
+      // cd command 
+      if (command_name === "cd") {
+        result = guest.cd(commands)
+      } else if (command_name === "pwd") {
+        result = guest.pwd()
+      }
+    }
 
     setHistory(
       [...histories,
@@ -33,6 +51,7 @@ export default function Home() {
         result: result
       }]
     )
+    setCurrentDir(guest.currentDir)
     reset()
     setInprogress(false)
   }
@@ -66,7 +85,7 @@ const Line = ({ history }: { history: History }) => {
 }
 
 
-const Dicrectory = ({ dir }: { dir: string }) => {
-  const label = dir === HOMEDIR ? "~" : dirName(dir)
+const Dicrectory = ({ dir }: { dir: string[] }) => {
+  const label = dir.toString() === "" ? "/" : dir.toString() === guest.home.toString() ? "~" : dir[dir.length - 1]
   return <span className="text-left px-1">{`[nkita@dev.site ${label} ]$`}</span>
 }

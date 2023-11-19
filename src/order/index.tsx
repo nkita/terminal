@@ -6,14 +6,16 @@ export const availableOder = [
     "cd",
 ]
 
-export const getResult = (order: string, setCurrentDir: (path: string) => void) => {
+export const HOMEDIR = ["home", "nkita"]
+
+export const getResult = (order: string, user: any) => {
 
     let result
     if (order) {
         result = availableOder.includes(order) ? <Result /> : `-bash: ${order}: command not found`
     }
-    setCurrentDir("/home")
 
+    
     return result
 }
 

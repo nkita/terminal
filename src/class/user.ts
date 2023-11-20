@@ -12,7 +12,6 @@ class User {
     }
 
     cd(args: string[]) {
-        console.log("currentDir!!!!!", this.currentDir, this.count++)
         let _tmp: string[] = []
         if (args.length >= 3) {
             return `-bash: cd: ${args.join(": ")}: No such file or directory`
@@ -23,14 +22,12 @@ class User {
             const path = args[1].split("/")
             if (path[0] === "") {
                 // Absolute path
-                _tmp = path.slice(1,)
+                _tmp = path.slice(1)
             } else {
                 // Relative path
                 if (path[0] === "~") {
                     // ~ Home directory
-                    _tmp = this.home.concat(path.slice(1,))
-                } else if (path[0] === "..") {
-                    _tmp = this.currentDir.slice(0, this.currentDir.length - 1).concat(path.slice(1,))
+                    _tmp = this.home.concat(path.slice(1))
                 } else {
                     _tmp = this.currentDir.concat(path)
                 }
@@ -40,7 +37,14 @@ class User {
         _tmp = _tmp.filter(t => t !== "" && t !== ".")
 
         // .. Change Directory to Parent #TODO
-
+        while (_tmp.includes("..")) {
+            const idx = _tmp.indexOf("..")
+            if (idx === 0) {
+                _tmp.splice(idx, 1)
+            } else {
+                _tmp.splice(idx - 1, 2)
+            }
+        }
         // folder check TODO
 
         this.currentDir = _tmp

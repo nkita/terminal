@@ -63,7 +63,7 @@ export default function Home() {
       {!inprogress &&
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex">
-            <Dicrectory dir={currentDir} /><div><input type='text' maxLength={30} size={30} className={"border-0  focus:outline-dotted"} autoComplete="off" {...register("order")} /></div>
+            <Dicrectory dir={currentDir} /><div><input type='text' maxLength={30} size={30} spellCheck={false} className={"border-0  focus:outline-dotted"} autoComplete="off" {...register("order")} /></div>
           </div>
         </form>
       }

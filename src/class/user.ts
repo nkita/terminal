@@ -35,7 +35,6 @@ class User {
         }
         // Trim Space And Current Directory Path(./)
         _tmp = _tmp.filter(t => t !== "" && t !== ".")
-
         // .. Change Directory to Parent #TODO
         while (_tmp.includes("..")) {
             const idx = _tmp.indexOf("..")

@@ -29,7 +29,7 @@ export default function Home() {
   const onSubmit: SubmitHandler<Order> = async (data: any) => {
     setInprogress(true)
 
-    const commands = data.order.replace(/ +/g, " ").split(" ");
+    const commands = data.order.replace(/ +/g, " ").split(" ").filter((c: string) => c !== "");
     const command_name = commands[0]
     let result
     if (command_name && !availableOder.includes(command_name)) {

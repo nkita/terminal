@@ -6,6 +6,7 @@ import { useState } from "react"
 import { History, Histories, Order } from '@/type'
 import { guest } from '@/class/user'
 
+
 export default function Home() {
   const [histories, setHistory] = useState<Histories>([])
   const [inprogress, setInprogress] = useState(false)
@@ -40,7 +41,18 @@ export default function Home() {
         result = guest.cd(commands)
       } else if (command_name === "pwd") {
         result = guest.pwd()
+      } else if (command_name === "ls") {
+        result = (
+          <div className="flex flex-wrap">
+            {
+              guest.ls().map((l: any, i: any) => {
+                return <div key={l + i} className="pr-6">{l}</div>
+              })
+            }
+          </div>
+        )
       }
+
     }
 
     setHistory(
@@ -56,7 +68,7 @@ export default function Home() {
     setInprogress(false)
   }
   return (
-    <div className=" h-screen ">
+    <div className=" h-screen p-2">
       {histories.map((h, i) => {
         return <div key={i}><Line history={h} /></div>
       })}
@@ -87,5 +99,5 @@ const Line = ({ history }: { history: History }) => {
 
 const Dicrectory = ({ dir }: { dir: string[] }) => {
   const label = dir.toString() === "" ? "/" : dir.toString() === guest.home.toString() ? "~" : dir[dir.length - 1]
-  return <span className="text-left px-1">{`[nkita@dev.site ${label} ]$`}</span>
+  return <span className="text-left">{`[nkita@dev.site ${label} ]$`}</span>
 }
